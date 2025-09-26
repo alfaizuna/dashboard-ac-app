@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: dashboard-ac-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dashboard_ac_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dashboard-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Service
+  api:
+    build: .
+    container_name: dashboard-ac-api
+    environment:
+      ENVIRONMENT: development
+      PORT: 8080
+      JWT_SECRET: your-super-secret-jwt-key-for-development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: dashboard_ac_dev
+      DB_SSLMODE: disable
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dashboard-network
+    restart: unless-stopped
+
+  # Adminer (Database Management)
+  adminer:
+    image: adminer:latest
+    container_name: dashboard-ac-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+    networks:
+      - dashboard-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  dashboard-network:
+    driver: bridge
