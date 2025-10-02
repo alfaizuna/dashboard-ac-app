@@ -13,6 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
     networks:
       - dashboard-network
     healthcheck:
@@ -25,16 +26,8 @@ services:
   api:
     build: .
     container_name: dashboard-ac-api
-    environment:
-      ENVIRONMENT: development
-      PORT: 8080
-      JWT_SECRET: your-super-secret-jwt-key-for-development
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: password
-      DB_NAME: dashboard_ac_dev
-      DB_SSLMODE: disable
+    env_file:
+      - .env.docker
     ports:
       - "8080:8080"
     depends_on:
@@ -43,6 +36,8 @@ services:
     networks:
       - dashboard-network
     restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
 
   # Adminer (Database Management)
   adminer:
@@ -55,6 +50,8 @@ services:
     networks:
       - dashboard-network
     restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
 
 volumes:
   postgres_data:

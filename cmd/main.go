@@ -11,8 +11,6 @@ import (
 	"dashboard-ac-backend/pkg/logger"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
@@ -33,27 +31,41 @@ func main() {
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
+	customerRepo := repository.NewCustomerRepository(db)
+	technicianRepo := repository.NewTechnicianRepository(db)
+	serviceRepo := repository.NewServiceRepository(db)
+	scheduleRepo := repository.NewScheduleRepository(db)
+	invoiceRepo := repository.NewInvoiceRepository(db)
+	invoiceDetailRepo := repository.NewInvoiceDetailRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg.JWTSecret)
 	userService := service.NewUserService(userRepo)
+	customerService := service.NewCustomerService(customerRepo)
+	technicianService := service.NewTechnicianService(technicianRepo)
+	serviceService := service.NewServiceService(serviceRepo)
+	scheduleService := service.NewScheduleService(scheduleRepo, customerRepo, technicianRepo, serviceRepo)
+	invoiceService := service.NewInvoiceService(invoiceRepo, customerRepo, scheduleRepo)
+	invoiceDetailService := service.NewInvoiceDetailService(invoiceDetailRepo, invoiceRepo, serviceRepo)
 
 	// Initialize Fiber app
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.ErrorHandler,
 	})
 
-	// Global middleware
-	app.Use(recover.New())
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
-		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
-	}))
-	app.Use(middleware.Logger())
-
-	// Setup routes
-	routes.SetupRoutes(app, authService, userService, cfg.JWTSecret)
+	// Setup routes with all services
+	routes.SetupRoutes(
+		app,
+		authService,
+		userService,
+		customerService,
+		technicianService,
+		serviceService,
+		scheduleService,
+		invoiceService,
+		invoiceDetailService,
+		cfg.JWTSecret,
+	)
 
 	// Start server
 	log.Printf("Server starting on port %s", cfg.Port)

@@ -1,115 +1,120 @@
-.PHONY: build run test test-unit test-integration clean migrate seed docker-up docker-down docker-build lint
+# Go parameters
+GOCMD=go
+GOBUILD=$(GOCMD) build
+GOCLEAN=$(GOCMD) clean
+GOTEST=$(GOCMD) test
+GOGET=$(GOCMD) get
+GOMOD=$(GOCMD) mod
+BINARY_NAME=main
+BINARY_UNIX=$(BINARY_NAME)_unix
 
-# Variables
-BINARY_NAME=dashboard-ac-backend
-MAIN_PATH=./cmd/main.go
-MIGRATE_PATH=./migrations/migrate.go
+# Docker parameters
+DOCKER_COMPOSE=docker-compose
+DOCKER_COMPOSE_PROD=docker-compose -f docker-compose.prod.yml
+
+.PHONY: all build clean test coverage deps run docker-build docker-up docker-down docker-logs help
+
+all: test build
 
 # Build the application
 build:
-	@echo "Building application..."
-	go build -o bin/$(BINARY_NAME) $(MAIN_PATH)
+	$(GOBUILD) -o $(BINARY_NAME) -v ./cmd/main.go
 
-# Run the application
-run:
-	@echo "Running application..."
-	go run $(MAIN_PATH)
+# Clean build files
+clean:
+	$(GOCLEAN)
+	rm -f $(BINARY_NAME)
+	rm -f $(BINARY_UNIX)
 
 # Run tests
 test:
-	@echo "Running tests..."
-	go test -v ./...
-
-# Run unit tests
-test-unit:
-	@echo "Running unit tests..."
-	go test -v ./tests/unit/...
-
-# Run integration tests
-test-integration:
-	@echo "Running integration tests..."
-	go test -v ./tests/integration/...
+	$(GOTEST) -v ./...
 
 # Run tests with coverage
-test-coverage:
-	@echo "Running tests with coverage..."
-	go test -v -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out -o coverage.html
+coverage:
+	$(GOTEST) -v -coverprofile=coverage.out ./...
+	$(GOCMD) tool cover -html=coverage.out
 
-# Clean build artifacts
-clean:
-	@echo "Cleaning..."
-	rm -rf bin/
-	rm -f coverage.out coverage.html
-
-# Run database migrations
-migrate:
-	@echo "Running database migrations..."
-	go run $(MIGRATE_PATH)
-
-# Seed database (alias for migrate since it includes seeding)
-seed: migrate
-
-# Install dependencies
+# Download dependencies
 deps:
-	@echo "Installing dependencies..."
-	go mod download
-	go mod tidy
+	$(GOMOD) download
+	$(GOMOD) tidy
 
-# Lint the code
+# Run the application locally
+run:
+	$(GOCMD) run ./cmd/main.go
+
+# Build for Linux
+build-linux:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_UNIX) -v ./cmd/main.go
+
+# Docker commands
+docker-build:
+	docker build -t dashboard-ac-backend .
+
+docker-up:
+	$(DOCKER_COMPOSE) up -d
+
+docker-down:
+	$(DOCKER_COMPOSE) down
+
+docker-logs:
+	$(DOCKER_COMPOSE) logs -f
+
+docker-restart:
+	$(DOCKER_COMPOSE) restart
+
+docker-clean:
+	$(DOCKER_COMPOSE) down -v --remove-orphans
+	docker system prune -f
+
+# Production Docker commands
+docker-prod-up:
+	$(DOCKER_COMPOSE_PROD) up -d
+
+docker-prod-down:
+	$(DOCKER_COMPOSE_PROD) down
+
+docker-prod-logs:
+	$(DOCKER_COMPOSE_PROD) logs -f
+
+# Database commands
+db-migrate:
+	$(GOCMD) run ./migrations/migrate.go
+
+db-reset:
+	$(DOCKER_COMPOSE) exec postgres psql -U postgres -d dashboard_ac_dev -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+
+# Development workflow
+dev: deps docker-up
+	@echo "Development environment is ready!"
+	@echo "API: http://localhost:8080"
+	@echo "Adminer: http://localhost:8081"
+
+# Linting
 lint:
-	@echo "Running linter..."
 	golangci-lint run
 
 # Format code
 fmt:
-	@echo "Formatting code..."
-	go fmt ./...
-
-# Docker commands
-docker-build:
-	@echo "Building Docker image..."
-	docker build -t $(BINARY_NAME) .
-
-docker-up:
-	@echo "Starting services with Docker Compose..."
-	docker-compose up -d
-
-docker-down:
-	@echo "Stopping services..."
-	docker-compose down
-
-docker-logs:
-	@echo "Showing logs..."
-	docker-compose logs -f
-
-# Development workflow
-dev: deps fmt lint test build
-
-# Production build
-prod-build:
-	@echo "Building for production..."
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/$(BINARY_NAME) $(MAIN_PATH)
+	$(GOCMD) fmt ./...
 
 # Help
 help:
 	@echo "Available commands:"
 	@echo "  build         - Build the application"
-	@echo "  run           - Run the application"
-	@echo "  test          - Run all tests"
-	@echo "  test-unit     - Run unit tests only"
-	@echo "  test-integration - Run integration tests only"
-	@echo "  test-coverage - Run tests with coverage report"
-	@echo "  clean         - Clean build artifacts"
-	@echo "  migrate       - Run database migrations and seeding"
-	@echo "  seed          - Alias for migrate"
-	@echo "  deps          - Install dependencies"
+	@echo "  clean         - Clean build files"
+	@echo "  test          - Run tests"
+	@echo "  coverage      - Run tests with coverage"
+	@echo "  deps          - Download dependencies"
+	@echo "  run           - Run the application locally"
+	@echo "  build-linux   - Build for Linux"
+	@echo "  docker-build  - Build Docker image"
+	@echo "  docker-up     - Start Docker containers"
+	@echo "  docker-down   - Stop Docker containers"
+	@echo "  docker-logs   - View Docker logs"
+	@echo "  docker-clean  - Clean Docker containers and volumes"
+	@echo "  dev           - Setup development environment"
 	@echo "  lint          - Run linter"
 	@echo "  fmt           - Format code"
-	@echo "  docker-build  - Build Docker image"
-	@echo "  docker-up     - Start services with Docker Compose"
-	@echo "  docker-down   - Stop services"
-	@echo "  docker-logs   - Show Docker logs"
-	@echo "  dev           - Run development workflow (deps, fmt, lint, test, build)"
-	@echo "  prod-build    - Build for production"
 	@echo "  help          - Show this help message"

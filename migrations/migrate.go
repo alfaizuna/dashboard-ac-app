@@ -42,6 +42,12 @@ func runMigrations(db *gorm.DB) error {
 	// Auto migrate all models
 	return db.AutoMigrate(
 		&domain.User{},
+		&domain.Customer{},
+		&domain.Technician{},
+		&domain.Service{},
+		&domain.Schedule{},
+		&domain.Invoice{},
+		&domain.InvoiceDetail{},
 	)
 }
 
@@ -97,5 +103,61 @@ func seedDatabase(db *gorm.DB) error {
 
 	log.Printf("Default technician user created with email: %s and password: tech123", technician.Email)
 
+	// Create default customer user
+	customerPassword, err := hash.HashPassword("customer123")
+	if err != nil {
+		return err
+	}
+
+	customer := domain.User{
+		Name:     "Default Customer",
+		Email:    "customer@example.com",
+		Password: customerPassword,
+		Role:     domain.RoleCustomer,
+		IsActive: true,
+	}
+
+	if err := db.Create(&customer).Error; err != nil {
+		return err
+	}
+
+	log.Printf("Default customer user created with email: %s and password: customer123", customer.Email)
+
+	// Seed default services
+	services := []domain.Service{
+		{
+			Name:     "Cuci AC",
+			Price:    150000,
+			Duration: 60, // 1 hour
+		},
+		{
+			Name:     "Isi Freon",
+			Price:    200000,
+			Duration: 45, // 45 minutes
+		},
+		{
+			Name:     "Bongkar Pasang AC",
+			Price:    500000,
+			Duration: 180, // 3 hours
+		},
+		{
+			Name:     "Service Rutin AC",
+			Price:    100000,
+			Duration: 30, // 30 minutes
+		},
+	}
+
+	for _, service := range services {
+		var existingService domain.Service
+		result := db.Where("name = ?", service.Name).First(&existingService)
+		if result.Error != nil {
+			if err := db.Create(&service).Error; err != nil {
+				return err
+			}
+			log.Printf("Service created: %s - Rp %.0f", service.Name, service.Price)
+		}
+	}
+
+	log.Println("Database seeding completed successfully!")
 	return nil
 }
