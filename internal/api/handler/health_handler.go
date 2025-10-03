@@ -1,24 +1,31 @@
 package handler
 
 import (
-	"time"
+    "time"
 
-	"dashboard-ac-backend/internal/api/response"
+    "dashboard-ac-backend/internal/api/response"
 
-	"github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2"
 )
 
 type HealthHandler struct{}
 
 func NewHealthHandler() *HealthHandler {
-	return &HealthHandler{}
+    return &HealthHandler{}
 }
 
 func (h *HealthHandler) Check(c *fiber.Ctx) error {
-	return response.Success(c, "Server is healthy", map[string]interface{}{
-		"status":    "ok",
-		"timestamp": time.Now().UTC(),
-		"service":   "dashboard-ac-backend",
-		"version":   "1.0.0",
-	})
+    // Health godoc
+    // @Summary Health check
+    // @Description Mengecek kesehatan server
+    // @Tags Health
+    // @Produce json
+    // @Success 200 {object} response.BaseResponse
+    // @Router /health [get]
+    return response.Success(c, "Server is healthy", map[string]interface{}{
+        "status":    "ok",
+        "timestamp": time.Now().UTC(),
+        "service":   "dashboard-ac-backend",
+        "version":   "1.0.0",
+    })
 }

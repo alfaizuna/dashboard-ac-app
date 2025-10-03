@@ -1,0 +1,2120 @@
+basePath: /api/v1
+definitions:
+  domain.Customer:
+    properties:
+      address:
+        maxLength: 500
+        minLength: 10
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 15
+        minLength: 10
+        type: string
+      updated_at:
+        type: string
+    required:
+    - address
+    - email
+    - name
+    - phone
+    type: object
+  domain.Invoice:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: string
+      invoice_date:
+        type: string
+      schedule_id:
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/domain.InvoiceStatus'
+        enum:
+        - Unpaid
+        - Paid
+        - Overdue
+      total_amount:
+        minimum: 0
+        type: number
+      updated_at:
+        type: string
+    required:
+    - customer_id
+    - due_date
+    - invoice_date
+    - schedule_id
+    - status
+    - total_amount
+    type: object
+  domain.InvoiceDetail:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      invoice_id:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      service_id:
+        type: string
+      subtotal:
+        minimum: 0
+        type: number
+      unit_price:
+        minimum: 0
+        type: number
+      updated_at:
+        type: string
+    required:
+    - invoice_id
+    - quantity
+    - service_id
+    - subtotal
+    - unit_price
+    type: object
+  domain.InvoiceStatus:
+    enum:
+    - Unpaid
+    - Paid
+    - Overdue
+    type: string
+    x-enum-varnames:
+    - InvoiceStatusUnpaid
+    - InvoiceStatusPaid
+    - InvoiceStatusOverdue
+  domain.Schedule:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: string
+      date:
+        type: string
+      id:
+        type: string
+      service_id:
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/domain.ScheduleStatus'
+        enum:
+        - Pending
+        - On-Progress
+        - Completed
+        - Canceled
+      technician_id:
+        type: string
+      time:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - customer_id
+    - date
+    - service_id
+    - status
+    - technician_id
+    - time
+    type: object
+  domain.ScheduleStatus:
+    enum:
+    - Pending
+    - On-Progress
+    - Completed
+    - Canceled
+    type: string
+    x-enum-varnames:
+    - ScheduleStatusPending
+    - ScheduleStatusOnProgress
+    - ScheduleStatusCompleted
+    - ScheduleStatusCanceled
+  domain.Service:
+    properties:
+      created_at:
+        type: string
+      duration:
+        description: in minutes
+        minimum: 1
+        type: integer
+      id:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      price:
+        minimum: 0
+        type: number
+      updated_at:
+        type: string
+    required:
+    - duration
+    - name
+    - price
+    type: object
+  domain.Technician:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 15
+        minLength: 10
+        type: string
+      specialization:
+        maxLength: 100
+        minLength: 2
+        type: string
+      updated_at:
+        type: string
+    required:
+    - name
+    - phone
+    - specialization
+    type: object
+  request.CustomerCreateRequest:
+    properties:
+      address:
+        maxLength: 500
+        minLength: 10
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 15
+        minLength: 10
+        type: string
+    required:
+    - address
+    - email
+    - name
+    - phone
+    type: object
+  request.CustomerUpdateRequest:
+    properties:
+      address:
+        maxLength: 500
+        minLength: 10
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 15
+        minLength: 10
+        type: string
+    type: object
+  request.InvoiceCreateRequest:
+    properties:
+      customer_id:
+        type: string
+      due_date:
+        type: string
+      invoice_date:
+        type: string
+      schedule_id:
+        type: string
+    required:
+    - customer_id
+    - due_date
+    - invoice_date
+    - schedule_id
+    type: object
+  request.InvoiceDetailCreateRequest:
+    properties:
+      invoice_id:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      service_id:
+        type: string
+      unit_price:
+        minimum: 0
+        type: number
+    required:
+    - invoice_id
+    - quantity
+    - service_id
+    - unit_price
+    type: object
+  request.InvoiceDetailUpdateRequest:
+    properties:
+      quantity:
+        minimum: 1
+        type: integer
+      unit_price:
+        minimum: 0
+        type: number
+    type: object
+  request.InvoiceUpdateRequest:
+    properties:
+      due_date:
+        type: string
+      invoice_date:
+        type: string
+      status:
+        enum:
+        - Unpaid
+        - Paid
+        - Overdue
+        type: string
+    type: object
+  request.ScheduleCreateRequest:
+    properties:
+      customer_id:
+        type: string
+      date:
+        type: string
+      service_id:
+        type: string
+      technician_id:
+        type: string
+      time:
+        type: string
+    required:
+    - customer_id
+    - date
+    - service_id
+    - technician_id
+    - time
+    type: object
+  request.ScheduleUpdateRequest:
+    properties:
+      date:
+        type: string
+      service_id:
+        type: string
+      status:
+        enum:
+        - Pending
+        - On-Progress
+        - Completed
+        - Canceled
+        type: string
+      technician_id:
+        type: string
+      time:
+        type: string
+    type: object
+  request.ServiceCreateRequest:
+    properties:
+      duration:
+        description: in minutes
+        minimum: 1
+        type: integer
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      price:
+        minimum: 0
+        type: number
+    required:
+    - duration
+    - name
+    - price
+    type: object
+  request.ServiceUpdateRequest:
+    properties:
+      duration:
+        minimum: 1
+        type: integer
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      price:
+        minimum: 0
+        type: number
+    type: object
+  request.TechnicianCreateRequest:
+    properties:
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 15
+        minLength: 10
+        type: string
+      specialization:
+        maxLength: 100
+        minLength: 2
+        type: string
+    required:
+    - name
+    - phone
+    - specialization
+    type: object
+  request.TechnicianUpdateRequest:
+    properties:
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      phone:
+        maxLength: 15
+        minLength: 10
+        type: string
+      specialization:
+        maxLength: 100
+        minLength: 2
+        type: string
+    type: object
+  response.BaseResponse:
+    properties:
+      data: {}
+      error: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: REST API untuk manajemen layanan AC (Dashboard AC)
+  title: Dashboard AC Backend API
+  version: 1.0.0
+paths:
+  /customers:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of customers
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Customer'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List customers
+      tags:
+      - customers
+    post:
+      consumes:
+      - application/json
+      description: Create a new customer with the provided information
+      parameters:
+      - description: Customer creation data
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomerCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Customer'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create a new customer
+      tags:
+      - customers
+  /customers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a customer by their ID
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete customer
+      tags:
+      - customers
+    get:
+      consumes:
+      - application/json
+      description: Get a customer by their ID
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Customer'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get customer by ID
+      tags:
+      - customers
+    put:
+      consumes:
+      - application/json
+      description: Update an existing customer with the provided information
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Customer update data
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomerUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Customer'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update customer
+      tags:
+      - customers
+  /customers/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for customers based on name, phone, or email
+      parameters:
+      - description: Customer name
+        in: query
+        name: name
+        type: string
+      - description: Customer phone
+        in: query
+        name: phone
+        type: string
+      - description: Customer email
+        in: query
+        name: email
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Customer'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Search customers
+      tags:
+      - customers
+  /invoice-details:
+    post:
+      consumes:
+      - application/json
+      description: Create a new invoice detail with the provided information
+      parameters:
+      - description: Invoice detail creation data
+        in: body
+        name: invoice_detail
+        required: true
+        schema:
+          $ref: '#/definitions/request.InvoiceDetailCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.InvoiceDetail'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create a new invoice detail
+      tags:
+      - invoice-details
+  /invoice-details/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an invoice detail by its ID
+      parameters:
+      - description: Invoice detail ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete invoice detail
+      tags:
+      - invoice-details
+    get:
+      consumes:
+      - application/json
+      description: Get an invoice detail by its ID
+      parameters:
+      - description: Invoice detail ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.InvoiceDetail'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get invoice detail by ID
+      tags:
+      - invoice-details
+    put:
+      consumes:
+      - application/json
+      description: Update an existing invoice detail with the provided information
+      parameters:
+      - description: Invoice detail ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Invoice detail update data
+        in: body
+        name: invoice_detail
+        required: true
+        schema:
+          $ref: '#/definitions/request.InvoiceDetailUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.InvoiceDetail'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update invoice detail
+      tags:
+      - invoice-details
+  /invoice-details/invoice/{invoice_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete all invoice details for a specific invoice
+      parameters:
+      - description: Invoice ID
+        in: path
+        name: invoice_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete invoice details by invoice
+      tags:
+      - invoice-details
+    get:
+      consumes:
+      - application/json
+      description: Get all invoice details for a specific invoice
+      parameters:
+      - description: Invoice ID
+        in: path
+        name: invoice_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.InvoiceDetail'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get invoice details by invoice
+      tags:
+      - invoice-details
+  /invoices:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of invoices
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Invoice'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List invoices
+      tags:
+      - invoices
+    post:
+      consumes:
+      - application/json
+      description: Create a new invoice with the provided information
+      parameters:
+      - description: Invoice creation data
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/request.InvoiceCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Invoice'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create a new invoice
+      tags:
+      - invoices
+  /invoices/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an invoice by its ID
+      parameters:
+      - description: Invoice ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete invoice
+      tags:
+      - invoices
+    get:
+      consumes:
+      - application/json
+      description: Get an invoice by its ID
+      parameters:
+      - description: Invoice ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Invoice'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get invoice by ID
+      tags:
+      - invoices
+    put:
+      consumes:
+      - application/json
+      description: Update an existing invoice with the provided information
+      parameters:
+      - description: Invoice ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Invoice update data
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/request.InvoiceUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Invoice'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update invoice
+      tags:
+      - invoices
+  /invoices/customer/{customer_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get invoices for a specific customer
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Invoice'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get invoices by customer
+      tags:
+      - invoices
+  /invoices/schedule/{schedule_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get invoices for a specific schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Invoice'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get invoices by schedule
+      tags:
+      - invoices
+  /invoices/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for invoices based on customer, schedule, status, and date
+        range
+      parameters:
+      - description: Customer ID
+        in: query
+        name: customer_id
+        type: string
+      - description: Schedule ID
+        in: query
+        name: schedule_id
+        type: string
+      - description: Invoice status
+        in: query
+        name: status
+        type: string
+      - description: Date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Invoice'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Search invoices
+      tags:
+      - invoices
+  /invoices/status/{status}:
+    get:
+      consumes:
+      - application/json
+      description: Get invoices with a specific status
+      parameters:
+      - description: Invoice status
+        in: path
+        name: status
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Invoice'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get invoices by status
+      tags:
+      - invoices
+  /schedules:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of schedules
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Schedule'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List schedules
+      tags:
+      - schedules
+    post:
+      consumes:
+      - application/json
+      description: Create a new schedule with the provided information
+      parameters:
+      - description: Schedule creation data
+        in: body
+        name: schedule
+        required: true
+        schema:
+          $ref: '#/definitions/request.ScheduleCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Schedule'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create a new schedule
+      tags:
+      - schedules
+  /schedules/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a schedule by its ID
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete schedule
+      tags:
+      - schedules
+    get:
+      consumes:
+      - application/json
+      description: Get a schedule by its ID
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Schedule'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get schedule by ID
+      tags:
+      - schedules
+    put:
+      consumes:
+      - application/json
+      description: Update an existing schedule with the provided information
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Schedule update data
+        in: body
+        name: schedule
+        required: true
+        schema:
+          $ref: '#/definitions/request.ScheduleUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Schedule'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update schedule
+      tags:
+      - schedules
+  /schedules/customer/{customer_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get schedules for a specific customer
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Schedule'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get schedules by customer
+      tags:
+      - schedules
+  /schedules/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for schedules based on customer, technician, service, status,
+        and date range
+      parameters:
+      - description: Customer ID
+        in: query
+        name: customer_id
+        type: string
+      - description: Technician ID
+        in: query
+        name: technician_id
+        type: string
+      - description: Service ID
+        in: query
+        name: service_id
+        type: string
+      - description: Schedule status
+        in: query
+        name: status
+        type: string
+      - description: Date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Schedule'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Search schedules
+      tags:
+      - schedules
+  /schedules/status/{status}:
+    get:
+      consumes:
+      - application/json
+      description: Get schedules with a specific status
+      parameters:
+      - description: Schedule status
+        in: path
+        name: status
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Schedule'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get schedules by status
+      tags:
+      - schedules
+  /schedules/technician/{technician_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get schedules for a specific technician
+      parameters:
+      - description: Technician ID
+        in: path
+        name: technician_id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Schedule'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get schedules by technician
+      tags:
+      - schedules
+  /services:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of services
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Service'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List services
+      tags:
+      - services
+    post:
+      consumes:
+      - application/json
+      description: Create a new service with the provided information
+      parameters:
+      - description: Service creation data
+        in: body
+        name: service
+        required: true
+        schema:
+          $ref: '#/definitions/request.ServiceCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Service'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create a new service
+      tags:
+      - services
+  /services/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a service by its ID
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete service
+      tags:
+      - services
+    get:
+      consumes:
+      - application/json
+      description: Get a service by its ID
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Service'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get service by ID
+      tags:
+      - services
+    put:
+      consumes:
+      - application/json
+      description: Update an existing service with the provided information
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Service update data
+        in: body
+        name: service
+        required: true
+        schema:
+          $ref: '#/definitions/request.ServiceUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Service'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update service
+      tags:
+      - services
+  /services/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for services based on name and price range
+      parameters:
+      - description: Service name
+        in: query
+        name: name
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: number
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Service'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Search services
+      tags:
+      - services
+  /technicians:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of technicians
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Technician'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: List technicians
+      tags:
+      - technicians
+    post:
+      consumes:
+      - application/json
+      description: Create a new technician with the provided information
+      parameters:
+      - description: Technician creation data
+        in: body
+        name: technician
+        required: true
+        schema:
+          $ref: '#/definitions/request.TechnicianCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Technician'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Create a new technician
+      tags:
+      - technicians
+  /technicians/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a technician by their ID
+      parameters:
+      - description: Technician ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Delete technician
+      tags:
+      - technicians
+    get:
+      consumes:
+      - application/json
+      description: Get a technician by their ID
+      parameters:
+      - description: Technician ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Technician'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Get technician by ID
+      tags:
+      - technicians
+    put:
+      consumes:
+      - application/json
+      description: Update an existing technician with the provided information
+      parameters:
+      - description: Technician ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Technician update data
+        in: body
+        name: technician
+        required: true
+        schema:
+          $ref: '#/definitions/request.TechnicianUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Technician'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Update technician
+      tags:
+      - technicians
+  /technicians/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for technicians based on name or specialization
+      parameters:
+      - description: Technician name
+        in: query
+        name: name
+        type: string
+      - description: Technician specialization
+        in: query
+        name: specialization
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.BaseResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Technician'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.BaseResponse'
+      summary: Search technicians
+      tags:
+      - technicians
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

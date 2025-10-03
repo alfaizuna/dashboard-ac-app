@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"dashboard-ac-backend/internal/api/request"
-	"dashboard-ac-backend/internal/api/response"
-	"dashboard-ac-backend/internal/domain"
-	"dashboard-ac-backend/internal/service"
-	"dashboard-ac-backend/pkg/utils"
+    "dashboard-ac-backend/internal/api/request"
+    "dashboard-ac-backend/internal/api/response"
+    "dashboard-ac-backend/internal/domain"
+    "dashboard-ac-backend/internal/service"
+    "dashboard-ac-backend/pkg/utils"
 
-	"github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2"
 )
 
 type AuthHandler struct {
@@ -21,10 +21,20 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
-	var req request.RegisterRequest
-	if err := c.BodyParser(&req); err != nil {
-		return response.BadRequest(c, "Invalid request body", nil)
-	}
+    // Register godoc
+    // @Summary Register user baru
+    // @Description Mendaftarkan pengguna baru (role: admin/technician)
+    // @Tags Auth
+    // @Accept json
+    // @Produce json
+    // @Param request body request.RegisterRequest true "Register Request"
+    // @Success 201 {object} response.BaseResponse
+    // @Failure 400 {object} response.BaseResponse
+    // @Router /auth/register [post]
+    var req request.RegisterRequest
+    if err := c.BodyParser(&req); err != nil {
+        return response.BadRequest(c, "Invalid request body", nil)
+    }
 
 	// Validate request
 	if errors := utils.ValidateStruct(&req); len(errors) > 0 {
@@ -46,10 +56,21 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
-	var req request.LoginRequest
-	if err := c.BodyParser(&req); err != nil {
-		return response.BadRequest(c, "Invalid request body", nil)
-	}
+    // Login godoc
+    // @Summary Login
+    // @Description Autentikasi pengguna dengan email dan password
+    // @Tags Auth
+    // @Accept json
+    // @Produce json
+    // @Param request body request.LoginRequest true "Login Request"
+    // @Success 200 {object} response.BaseResponse
+    // @Failure 401 {object} response.BaseResponse
+    // @Failure 400 {object} response.BaseResponse
+    // @Router /auth/login [post]
+    var req request.LoginRequest
+    if err := c.BodyParser(&req); err != nil {
+        return response.BadRequest(c, "Invalid request body", nil)
+    }
 
 	// Validate request
 	if errors := utils.ValidateStruct(&req); len(errors) > 0 {
@@ -74,10 +95,21 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
-	var req request.RefreshTokenRequest
-	if err := c.BodyParser(&req); err != nil {
-		return response.BadRequest(c, "Invalid request body", nil)
-	}
+    // RefreshToken godoc
+    // @Summary Refresh token
+    // @Description Menghasilkan pasangan token baru dari refresh token
+    // @Tags Auth
+    // @Accept json
+    // @Produce json
+    // @Param request body request.RefreshTokenRequest true "Refresh Token Request"
+    // @Success 200 {object} response.BaseResponse
+    // @Failure 401 {object} response.BaseResponse
+    // @Failure 400 {object} response.BaseResponse
+    // @Router /auth/refresh [post]
+    var req request.RefreshTokenRequest
+    if err := c.BodyParser(&req); err != nil {
+        return response.BadRequest(c, "Invalid request body", nil)
+    }
 
 	// Validate request
 	if errors := utils.ValidateStruct(&req); len(errors) > 0 {
@@ -96,13 +128,22 @@ func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Me(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(uint)
-	userEmail := c.Locals("user_email").(string)
-	userRole := c.Locals("user_role").(domain.Role)
+    // Me godoc
+    // @Summary Profil pengguna saat ini
+    // @Description Mendapatkan profil user dari token JWT
+    // @Tags Auth
+    // @Security BearerAuth
+    // @Produce json
+    // @Success 200 {object} response.BaseResponse
+    // @Failure 401 {object} response.BaseResponse
+    // @Router /me [get]
+    userID := c.Locals("user_id").(uint)
+    userEmail := c.Locals("user_email").(string)
+    userRole := c.Locals("user_role").(domain.Role)
 
-	return response.Success(c, "User profile retrieved successfully", map[string]interface{}{
-		"id":    userID,
-		"email": userEmail,
-		"role":  string(userRole),
-	})
+    return response.Success(c, "User profile retrieved successfully", map[string]interface{}{
+        "id":    userID,
+        "email": userEmail,
+        "role":  string(userRole),
+    })
 }

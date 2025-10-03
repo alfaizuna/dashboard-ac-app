@@ -1,11 +1,12 @@
 package routes
 
 import (
-	"dashboard-ac-backend/internal/api/handler"
-	"dashboard-ac-backend/internal/api/middleware"
-	"dashboard-ac-backend/internal/service"
+    "dashboard-ac-backend/internal/api/handler"
+    "dashboard-ac-backend/internal/api/middleware"
+    "dashboard-ac-backend/internal/service"
 
-	"github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2"
+    swagger "github.com/gofiber/swagger"
 )
 
 func SetupRoutes(
@@ -20,16 +21,24 @@ func SetupRoutes(
 	invoiceDetailService service.InvoiceDetailService,
 	jwtSecret string,
 ) {
-	// Setup global middleware
-	app.Use(middleware.Logger())
-	app.Use(middleware.Recovery())
-	app.Use(middleware.CORS())
+    // Setup global middleware
+    app.Use(middleware.Logger())
+    app.Use(middleware.Recovery())
+    app.Use(middleware.CORS())
 
-	// Initialize handlers
-	healthHandler := handler.NewHealthHandler()
-	authHandler := handler.NewAuthHandler(authService)
-	userHandler := handler.NewUserHandler(userService)
-	customerHandler := handler.NewCustomerHandler(customerService)
+    // Swagger UI route (accessible without auth)
+    // Visit http://localhost:<port>/docs to view API documentation
+    app.Get("/docs/*", swagger.New(swagger.Config{
+        Title: "Dashboard AC Backend API",
+        DeepLinking: true,
+        // HideTop field removed as it's not supported in swagger.Config
+    }))
+
+    // Initialize handlers
+    healthHandler := handler.NewHealthHandler()
+    authHandler := handler.NewAuthHandler(authService)
+    userHandler := handler.NewUserHandler(userService)
+    customerHandler := handler.NewCustomerHandler(customerService)
 	technicianHandler := handler.NewTechnicianHandler(technicianService)
 	serviceHandler := handler.NewServiceHandler(serviceService)
 	scheduleHandler := handler.NewScheduleHandler(scheduleService)
