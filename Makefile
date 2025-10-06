@@ -87,9 +87,9 @@ db-reset:
 
 # Development workflow
 dev: deps docker-up
-	@echo "Development environment is ready!"
+	@echo "Development environment is running!"
 	@echo "API: http://localhost:8088"
-	@echo "Adminer: http://localhost:8081"
+	@echo "Drizzle Studio: http://localhost:4983"
 
 # Linting
 lint:
