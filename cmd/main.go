@@ -39,6 +39,11 @@ func main() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
+	// Run auto migration
+	if err := config.AutoMigrate(db); err != nil {
+		log.Fatal("Failed to run auto migration:", err)
+	}
+
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
 	customerRepo := repository.NewCustomerRepository(db)

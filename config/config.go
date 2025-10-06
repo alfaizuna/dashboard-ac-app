@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"log"
 
+	"dashboard-ac-backend/internal/domain"
+	"dashboard-ac-backend/pkg/hash"
+
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -89,4 +92,71 @@ func InitDatabase(cfg *Config) (*gorm.DB, error) {
 	}
 
 	return db, nil
+}
+
+// AutoMigrate runs database migrations automatically
+func AutoMigrate(db *gorm.DB) error {
+	log.Println("Starting database migration...")
+	
+	// Run auto migration for all models
+	err := db.AutoMigrate(
+		&domain.User{},
+		&domain.Customer{},
+		&domain.Technician{},
+		&domain.Service{},
+		&domain.Schedule{},
+		&domain.Invoice{},
+		&domain.InvoiceDetail{},
+	)
+	
+	if err != nil {
+		log.Printf("Failed to run migrations: %v", err)
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+	
+	log.Println("Database migration completed successfully")
+	
+	// Run seeding for initial data
+	if err := seedInitialData(db); err != nil {
+		log.Printf("Failed to seed initial data: %v", err)
+		return fmt.Errorf("failed to seed initial data: %w", err)
+	}
+	
+	return nil
+}
+
+// seedInitialData creates initial admin user if not exists
+func seedInitialData(db *gorm.DB) error {
+	log.Println("Checking for initial data...")
+	
+	// Check if admin user already exists
+	var adminUser domain.User
+	result := db.Where("email = ?", "admin@dashboardac.com").First(&adminUser)
+	
+	if result.Error == nil {
+		log.Println("Admin user already exists, skipping seeding")
+		return nil
+	}
+	
+	// Create admin user
+	hashedPassword, err := hash.HashPassword("admin123")
+	if err != nil {
+		return fmt.Errorf("failed to hash admin password: %w", err)
+	}
+	
+	admin := domain.User{
+		Name:     "Administrator",
+		Email:    "admin@dashboardac.com",
+		Password: hashedPassword,
+		Role:     "admin",
+	}
+	
+	if err := db.Create(&admin).Error; err != nil {
+		return fmt.Errorf("failed to create admin user: %w", err)
+	}
+	
+	log.Println("Initial admin user created successfully")
+	log.Println("Admin credentials - Email: admin@dashboardac.com, Password: admin123")
+	
+	return nil
 }
