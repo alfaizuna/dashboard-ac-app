@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: 4dm1nP@ssw0rd
       POSTGRES_DB: dashboard_ac_dev
     ports:
-      - "5437:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
@@ -29,7 +29,7 @@ services:
     env_file:
       - .env.docker
     ports:
-      - "8080:8080"
+      - "8088:8088"
     depends_on:
       postgres:
         condition: service_healthy

@@ -88,7 +88,7 @@ db-reset:
 # Development workflow
 dev: deps docker-up
 	@echo "Development environment is ready!"
-	@echo "API: http://localhost:8080"
+	@echo "API: http://localhost:8088"
 	@echo "Adminer: http://localhost:8081"
 
 # Linting
