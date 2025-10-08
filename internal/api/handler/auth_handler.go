@@ -23,7 +23,7 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
     // Register godoc
     // @Summary Register user baru
-    // @Description Mendaftarkan pengguna baru (role: admin/technician)
+    // @Description Mendaftarkan pengguna baru (role: admin/technician/customer)
     // @Tags Auth
     // @Accept json
     // @Produce json
@@ -47,12 +47,23 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		return response.BadRequest(c, err.Error(), nil)
 	}
 
-	return response.Created(c, "User registered successfully", map[string]interface{}{
+	// Prepare response data
+	responseData := map[string]interface{}{
 		"id":    user.ID,
 		"name":  user.Name,
 		"email": user.Email,
 		"role":  user.Role,
-	})
+	}
+
+	// Add success message based on role
+	var message string
+	if user.Role == domain.RoleCustomer {
+		message = "Customer registered successfully"
+	} else {
+		message = "User registered successfully"
+	}
+
+	return response.Created(c, message, responseData)
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {

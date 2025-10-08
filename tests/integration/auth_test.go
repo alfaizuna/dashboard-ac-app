@@ -45,12 +45,13 @@ func (suite *AuthTestSuite) SetupSuite() {
 	suite.db = db
 
 	// Auto migrate
-	err = db.AutoMigrate(&domain.User{})
+	err = db.AutoMigrate(&domain.User{}, &domain.Customer{})
 	suite.Require().NoError(err)
 
 	// Setup repositories and services
 	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo, "test-secret-key-for-integration-testing")
+	customerRepo := repository.NewCustomerRepository(db)
+	authService := service.NewAuthService(userRepo, customerRepo, db, "test-secret-key-for-integration-testing")
 
 	// Setup handlers
 	suite.authHandler = handler.NewAuthHandler(authService)

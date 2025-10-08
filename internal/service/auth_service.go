@@ -20,14 +20,18 @@ type AuthService interface {
 }
 
 type authService struct {
-	userRepo  repository.UserRepository
-	jwtSecret string
+	userRepo     repository.UserRepository
+	customerRepo repository.CustomerRepository
+	db           *gorm.DB
+	jwtSecret    string
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthService {
+func NewAuthService(userRepo repository.UserRepository, customerRepo repository.CustomerRepository, db *gorm.DB, jwtSecret string) AuthService {
 	return &authService{
-		userRepo:  userRepo,
-		jwtSecret: jwtSecret,
+		userRepo:     userRepo,
+		customerRepo: customerRepo,
+		db:           db,
+		jwtSecret:    jwtSecret,
 	}
 }
 
@@ -53,6 +57,29 @@ func (s *authService) Register(req *request.RegisterRequest) (*domain.User, erro
 		role = domain.RoleCustomer
 	}
 
+	// Validate customer fields if role is customer
+	if role == domain.RoleCustomer {
+		if req.Phone == "" {
+			return nil, errors.New("phone is required for customer registration")
+		}
+		if req.Address == "" {
+			return nil, errors.New("address is required for customer registration")
+		}
+	}
+
+	// Start database transaction
+	tx := s.db.Begin()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	// Rollback transaction on error
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	// Create user
 	user := &domain.User{
 		Name:     req.Name,
@@ -62,7 +89,28 @@ func (s *authService) Register(req *request.RegisterRequest) (*domain.User, erro
 		IsActive: true,
 	}
 
-	if err := s.userRepo.Create(user); err != nil {
+	if err := tx.Create(user).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// If role is customer, also create customer record
+	if role == domain.RoleCustomer {
+		customer := &domain.Customer{
+			Name:    req.Name,
+			Phone:   req.Phone,
+			Address: req.Address,
+			Email:   req.Email,
+		}
+
+		if err := tx.Create(customer).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit().Error; err != nil {
 		return nil, err
 	}
 

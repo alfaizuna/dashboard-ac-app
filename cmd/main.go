@@ -54,7 +54,7 @@ func main() {
 	invoiceDetailRepo := repository.NewInvoiceDetailRepository(db)
 
 	// Initialize services
-	authService := service.NewAuthService(userRepo, cfg.JWTSecret)
+	authService := service.NewAuthService(userRepo, customerRepo, db, cfg.JWTSecret)
 	userService := service.NewUserService(userRepo)
 	customerService := service.NewCustomerService(customerRepo)
 	technicianService := service.NewTechnicianService(technicianRepo)
