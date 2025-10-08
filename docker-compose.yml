@@ -16,6 +16,7 @@ services:
       - ./migrations:/docker-entrypoint-initdb.d
     networks:
       - dashboard-network
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -35,48 +36,12 @@ services:
         condition: service_healthy
     networks:
       - dashboard-network
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./logs:/app/logs
 
-  # Drizzle Studio (Database Management)
-  drizzle-studio:
-    image: node:18-alpine
-    container_name: dashboard-ac-drizzle-studio
-    working_dir: /app
-    ports:
-      - "4983:4983"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - dashboard-network
-    restart: unless-stopped
-    environment:
-      - DATABASE_URL=postgresql://4dm1n:4dm1nP@ssw0rd@postgres:5432/dashboard_ac_dev
-    command: >
-      sh -c "
-        apk add --no-cache git &&
-        npm install -g drizzle-kit@latest &&
-        mkdir -p /app &&
-        cd /app &&
-        npm init -y &&
-        npm install drizzle-kit drizzle-orm pg &&
-        echo 'import { defineConfig } from \"drizzle-kit\";
-        export default defineConfig({
-          dialect: \"postgresql\",
-          dbCredentials: {
-            url: process.env.DATABASE_URL,
-          },
-        });' > drizzle.config.ts &&
-        npx drizzle-kit studio --host 0.0.0.0 --port 4983 --verbose
-      "
-    volumes:
-      - drizzle_data:/app
-
 volumes:
   postgres_data:
-  drizzle_data:
 
 networks:
   dashboard-network:
